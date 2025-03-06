@@ -9,7 +9,10 @@ app.post('/login',login);
 app.post('/register',register);
 
 app.use(AuthMiddleware);
-
+app.get('/verify',(req,res)=>{
+    res.statusCode = 200;
+    res.json({success:true});
+});
 app.post('/logout',logout);
 
 export default app;
