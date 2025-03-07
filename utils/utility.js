@@ -1,12 +1,13 @@
 import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
-
+import crypto from "crypto"; 
 const CookieOptions = {
-    maxAge: 24*60*60*1000,
-    httpOnly:true,
-    sameSite:"none",
-    secure:true
-}
+    maxAge: 24 * 60 * 60 * 1000, // 1 day
+    httpOnly: true,  // Prevent client-side JS access
+    sameSite: "none", // SameSite prevents CSRF attacks
+    secure: true, // Secure in production
+};
+
 
 class ErrorHandler extends Error {
     constructor(message,statusCode) {
@@ -29,7 +30,7 @@ const connectDB = (uri,dbName)=>{
 
 const sendToken = (res,user,statusCode,message)=>{
     const token  = jwt.sign({id:user._id},process.env.JWT_SECRET,{
-        expiresIn: 1000*60*60*24
+        expiresIn: "1d"
     });
 
     console.log(token);
@@ -43,11 +44,8 @@ const sendToken = (res,user,statusCode,message)=>{
 }
 
 const getTokenFromHeader = (req)=>{
-    const authorization = req.headers.authorization;
-    if(authorization && authorization.startsWith('Bearer')){
-        return authorization.split(' ')[1];
-    }
-    return null;
+    const token = req.cookies["user-token"];
+    return token;
 }
 
 const passwordValidator = (password)=>{
@@ -73,4 +71,9 @@ const nameValidator = (name)=>{
     return true;
 }
 
-export {connectDB,sendToken,ErrorHandler,getTokenFromHeader,passwordValidator,emailValidator,nameValidator};
+  //generate a hash of the data
+function generateHash(data) {
+    return crypto.createHash("sha256").update(JSON.stringify(data)).digest("hex");
+}
+
+export {connectDB,sendToken,ErrorHandler,getTokenFromHeader,passwordValidator,emailValidator,nameValidator,generateHash};

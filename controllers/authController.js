@@ -58,8 +58,9 @@ const logout = TryCatch(async (req,res,next)=>{
     res.cookie("user-token","none",{
         expires:new Date(Date.now()),
         httpOnly:true,
-        sameSite:"none",
-        secure:true
+        sameSite: "None", // SameSite attribute set to none
+        secure: true// Secure in production
+    
     });
     res.status(200).json({
         success:true,
