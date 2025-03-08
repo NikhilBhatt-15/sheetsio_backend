@@ -28,8 +28,15 @@ async function fetchSheetData(sheetId, ws) {
             console.log("Google Sheets updated! Sending new data...");
             client.lastHash = newHash; // Store the new hash
 
+           
             if (ws.readyState === WebSocket.OPEN) {
-                ws.send(JSON.stringify(newData));
+                ws.send(JSON.stringify({
+                    type: "google_sheets_data",
+                    payload: {
+                        values: newData,
+                        range: "A1:Z100"
+                    }
+                }));
             }
         }
     } catch (error) {
@@ -39,26 +46,31 @@ async function fetchSheetData(sheetId, ws) {
 
 export function webSocketService(server) {
     const wss = new WebSocketServer({ server });
-    
-    
+
     wss.on("connection", (ws) => {
         console.log("New WebSocket client connected");
+
         ws.on("message", (message) => {
             try {
                 const parsedMessage = JSON.parse(message);
                 console.log("Received message:", parsedMessage);
                 const { type, sheetId } = parsedMessage;
-    
+
                 if (type === "connect") {
                     console.log("Client connected with sheet:", sheetId);
-    
-                    // Store client and start fetching
+
+                    // Update client with new sheetId and reset lastHash
                     clients.set(ws, { sheetId, lastHash: "" });
-    
+
                     // Fetch data immediately & set interval
                     fetchSheetData(sheetId, ws);
                     const intervalId = setInterval(() => fetchSheetData(sheetId, ws), 5000); // Fetch every 5s
-    
+
+                    // Clear previous interval if exists
+                    if (ws.intervalId) {
+                        clearInterval(ws.intervalId);
+                    }
+
                     ws.intervalId = intervalId; // Store interval for cleanup
                 } else if (type === "disconnect") {
                     console.log("Client disconnected manually");
@@ -68,7 +80,7 @@ export function webSocketService(server) {
                 console.error("Error processing message:", error);
             }
         });
-    
+
         ws.on("close", () => {
             console.log("Client disconnected");
             disconnectClient(ws);

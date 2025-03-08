@@ -35,7 +35,7 @@ connectDB(process.env.MONGO_URI, process.env.DB_NAME);
 app.get("/", (req, res) => res.send("Welcome to TableSync backend"));
 app.use("/api/v1/auth", auth);
 app.use(AuthMiddleware);
-app.use('api/v1/tablesync',tablesRoutes);
+app.use("/api/v1/tablesync",tablesRoutes);
 app.use(errorMiddleware);
 
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
