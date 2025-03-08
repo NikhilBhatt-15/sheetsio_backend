@@ -12,7 +12,7 @@ const AuthMiddleware = TryCatch(async(req,res,next)=>{
         return next(new ErrorHandler("Not Authorized",401));
     }
 
-    const decode = jwt.verify(token,process.env.jwt_secret);
+    const decode = jwt.verify(token,process.env.JWT_SECRET);
     if(!decode){
         return next(new ErrorHandler("Invalid token",401));
     }
