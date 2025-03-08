@@ -42,6 +42,64 @@ const updateTable = TryCatch(async (req,res)=>{
     const tableId = req.params.id;
     const tableRows = req.body.rows;
     const columns = req.body.columns;
+
+
+
+    const table = await TableModel.findById(tableId);
+    if(!table){
+        return next(new ErrorHandler("Table not found",404));
+    }
+    await TableModel.updateOne({
+        _id:tableId
+    },{
+        columns:columns
+    })
+    let tableData = await TableDataModel.findOne({
+        tableId:tableId
+    });
+    if(tableData){
+        await TableDataModel.updateOne({
+            tableId:tableId
+        },{
+            rows:tableRows
+        })
+    }
+    else{
+        tableData = await TableDataModel.create({
+            tableId:tableId,
+            rows:tableRows
+        })
+    }   
+    res.status(200).json({
+        success:true,
+        table,
+        rows:tableData.rows
+    })
+})
+
+const readTable  = TryCatch(async(req,res)=>{
+    const table  = await TableModel.findById(req.params.id);
+    if(!table){
+        return next(new ErrorHandler("Table not found",404));
+    }
+    const tableData =await  TableDataModel.findOne({
+        tableId:req.params.id
+    })
+    // table.data = tableData.rows;
+    if(tableData){
+        table.data = tableData.rows;
+    }
+    res.status(200).json({
+        success:true,
+        table,
+        rows:table.data?table.data:[]
+    })  
+})
+
+const saveTable = TryCatch(async(req,res)=>{
+    const tableId = req.params.id;
+    const tableRows = req.body.rows;
+    const columns = req.body.columns;
     const table = await TableModel.findById(tableId);
     if(!table){
         return next(new ErrorHandler("Table not found",404));
@@ -70,23 +128,4 @@ const updateTable = TryCatch(async (req,res)=>{
     })
 })
 
-const readTable  = TryCatch(async(req,res)=>{
-    const table  = await TableModel.findById(req.params.id);
-    if(!table){
-        return next(new ErrorHandler("Table not found",404));
-    }
-    const tableData =await  TableDataModel.findOne({
-        tableId:req.params.id
-    })
-    // table.data = tableData.rows;
-    if(tableData){
-        table.data = tableData.rows;
-    }
-    res.status(200).json({
-        success:true,
-        table,
-        rows:table.data?table.data:[]
-    })  
-})
-
-export {createTable,getTables,updateTable,readTable};
+export {createTable,getTables,updateTable,readTable,saveTable};
