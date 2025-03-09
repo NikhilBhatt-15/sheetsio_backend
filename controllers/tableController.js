@@ -42,7 +42,7 @@ const updateTable = TryCatch(async (req,res)=>{
     const tableId = req.params.id;
     const tableRows = req.body.rows;
     const columns = req.body.columns;
-
+    const tableName = req.body.tableName;
 
 
     const table = await TableModel.findById(tableId);
@@ -52,7 +52,8 @@ const updateTable = TryCatch(async (req,res)=>{
     await TableModel.updateOne({
         _id:tableId
     },{
-        columns:columns
+        columns:columns,
+        tableName:tableName
     })
     let tableData = await TableDataModel.findOne({
         tableId:tableId

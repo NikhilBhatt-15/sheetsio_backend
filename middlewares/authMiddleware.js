@@ -7,7 +7,7 @@ import {ErrorHandler,getTokenFromHeader} from "../utils/utility.js";
 
 const AuthMiddleware = TryCatch(async(req,res,next)=>{
     const token = getTokenFromHeader(req);
-    console.log(token);
+
     if(!token){
         return next(new ErrorHandler("Not Authorized",401));
     }
