@@ -4,6 +4,8 @@ This is the backend for the TableSync project. It includes an Express server, We
 
 ## Table of Contents
 
+- [Technologies Used](#technologies-used)
+- [Project Functionality](#project-functionality)
 - [Installation](#installation)
 - [Configuration](#configuration)
 - [Usage](#usage)
@@ -13,12 +15,27 @@ This is the backend for the TableSync project. It includes an Express server, We
 - [Error Handling](#error-handling)
 - [License](#license)
 
+## Technologies Used
+
+- **Node.js**: JavaScript runtime for building the backend.
+- **Express**: Web framework for Node.js.
+- **MongoDB**: NoSQL database for storing data.
+- **Mongoose**: ODM for MongoDB.
+- **JWT**: JSON Web Tokens for authentication.
+- **WebSocket**: Real-time communication.
+
+## Project Functionality
+
+- **Authentication**: User login, logout, and token verification.
+- **Data Management**: CRUD operations for tables.
+- **Real-time Updates**: WebSocket service for real-time data fetching and updates.
+
 ## Installation
 
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/yourusername/tablesync_backend.git
+   git clone https://github.com/NikhilBhatt-15/sheetsio_backend
    cd tablesync_backend
    ```
 
@@ -101,10 +118,15 @@ The WebSocket server is initialized with the HTTP server and listens for connect
 ### Example Usage
 
 ```javascript
-const { generateHash, connectDB, sendToken, getTokenFromHeader } = require('./utils');
+const {
+  generateHash,
+  connectDB,
+  sendToken,
+  getTokenFromHeader,
+} = require("./utils");
 
 // Generate a hash
-const hash = generateHash('some_data');
+const hash = generateHash("some_data");
 
 // Connect to the database
 connectDB();
@@ -131,7 +153,7 @@ const errorMiddleware = (err, req, res, next) => {
   const statusCode = err.statusCode || 500;
   res.status(statusCode).json({
     message: err.message,
-    stack: process.env.NODE_ENV === 'production' ? null : err.stack,
+    stack: process.env.NODE_ENV === "production" ? null : err.stack,
   });
 };
 
